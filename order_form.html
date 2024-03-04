@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Form</title>
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,60 +62,53 @@
         form button:hover {
             background-color: #45a049;
         }
-  
-  
-  /* The Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
 
-/* Modal Content/Box */
-.modal-content {
-  background-color: white;
-  margin: auto;
-  width: 70%;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Shadow */
-  text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+        /* The Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
 
-/* Bold Text */
-.bold {
-  font-weight: bold;
-}
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            width: 70%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Shadow */
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-/* OK Button */
-#okButton {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+        /* Bold Text */
+        .bold {
+            font-weight: bold;
+        }
 
-#okButton:hover {
-  background-color: #45a049;
-}
+        /* OK Button */
+        #okButton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
+        #okButton:hover {
+            background-color: #45a049;
+        }
 
-  
-    </style>
-
-
- <style>
         .nav.nav--icons {
             position: fixed;
             bottom: 20px;
@@ -158,8 +151,6 @@
             margin-bottom: 5px;
         }
     </style>
-
-
 </head>
 <body>
     <header>
@@ -200,21 +191,21 @@
         <button type="button" onclick="uploadData()">Place Order</button>
     </form>
   
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <p id="modalMessage" class="bold"></p>
-    <button id="okButton">OK</button>
-  </div>
-</div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage" class="bold"></p>
+            <button id="okButton">OK</button>
+        </div>
+    </div>
 
-  <div id="requiredModal" class="modal">
-  <div class="modal-content">
-    <p id="requiredMessage" class="bold">Please fill in all the required fields.</p>
-    <button id="requiredOkButton">OK</button>
-  </div>
-</div>
+    <div id="requiredModal" class="modal">
+        <div class="modal-content">
+            <p id="requiredMessage" class="bold">Please fill in all the required fields.</p>
+            <button id="requiredOkButton">OK</button>
+        </div>
+    </div>
 
-  <nav class="nav nav--icons">
+    <nav class="nav nav--icons">
         <ul>
             <li>
                 <a href="index.html">
@@ -238,131 +229,103 @@
     </nav>
   
     <script>
-        
-function displayOrderSummary() {
-    const cartItems = JSON.parse(localStorage.getItem('cart')) || []; // Retrieve cart items
-    let productNames = '';
+        function displayOrderSummary() {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            let productNames = '';
 
-    // Iterate through cart items and construct the string of product names
-    cartItems.forEach((item, index) => {
-        // Append product name and quantity to the string
-        productNames += `${item.name} (${item.quantity || 1}x)`;
+            cartItems.forEach((item, index) => {
+                productNames += `${item.name} (${item.quantity || 1}x)`;
 
-        // Add a comma and space after each product name, except for the last one
-        if (index < cartItems.length - 1) {
-            productNames += ', ';
+                if (index < cartItems.length - 1) {
+                    productNames += ', ';
+                }
+            });
+
+            const productNameDiv = document.getElementById('productName');
+            productNameDiv.textContent = productNames;
+
+            const shippingFee = 10;
+            const totalAmount = cartItems.reduce((total, item) => total + parseFloat(item.price) * (item.quantity || 1), 0) + shippingFee;
+
+            const totalAmountDiv = document.getElementById('totalAmount');
+            totalAmountDiv.textContent = `Total Amount: ৳${totalAmount.toFixed(2)}`;
         }
-    });
 
-    // Display the constructed string of product names in the product name div
-    const productNameDiv = document.getElementById('productName');
-    productNameDiv.textContent = productNames;
+        function uploadData() {
+            const form = document.getElementById('orderForm');
+            if (!form.checkValidity()) {
+                const requiredModal = document.getElementById("requiredModal");
+                requiredModal.style.display = "block";
+                return;
+            }
 
-    // Calculate total amount including shipping fee
-    const shippingFee = 10; // Example shipping fee
-    const totalAmount = cartItems.reduce((total, item) => total + parseFloat(item.price) * (item.quantity || 1), 0) + shippingFee;
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const email = document.getElementById('email').value;
+            const district = document.getElementById('district').value;
+            const thana = document.getElementById('thana').value;
+            const address = document.getElementById('address').value;
+            const productName = document.getElementById('productName').textContent;
+            const totalAmountText = document.getElementById('totalAmount').textContent;
+            
+            const totalAmount = parseFloat(totalAmountText.match(/\d+\.\d+/)[0]);
+            const cashOnDeliveryAmount = totalAmount + 5;
 
-    // Display the total amount in the total amount div
-    const totalAmountDiv = document.getElementById('totalAmount');
-    totalAmountDiv.textContent = `Total Amount: ৳${totalAmount.toFixed(2)}`; // Displaying total amount
-}
+            const order = {
+                fullName: fullName,
+                phoneNumber: phoneNumber,
+                email: email,
+                district: district,
+                thana: thana,
+                address: address,
+                productName: productName,
+                totalAmount: totalAmount,
+                currentDateTime: new Date().toLocaleString(),
+                orderNumber: Math.floor(Math.random() * 1000000) + 1
+            };
 
-     function uploadData() {
-    // Check if the form is valid
-    const form = document.getElementById('orderForm');
-    if (!form.checkValidity()) {
-        // If the form is invalid, display the required form message modal
-        const requiredModal = document.getElementById("requiredModal");
-        requiredModal.style.display = "block";
-        return; // Exit the function without submitting the form
-    }
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
 
-    // Get form values and calculate cash on delivery amount
-    const fullName = document.getElementById('fullName').value;
-    const phoneNumber = document.getElementById('phoneNumber').value;
-    const email = document.getElementById('email').value;
-    const district = document.getElementById('district').value;
-    const thana = document.getElementById('thana').value;
-    const address = document.getElementById('address').value;
-    const productName = document.getElementById('productName').textContent; // Get text content instead of value
-    const totalAmountText = document.getElementById('totalAmount').textContent; // Get text content instead of value
-    const totalAmount = parseFloat(totalAmountText.split(' ')[2]); // Extract the numerical value from the text content
-    const cashOnDeliveryAmount = totalAmount + 5; // Example cash on delivery fee
+            const modal = document.getElementById("myModal");
+            const modalMessage = document.getElementById("modalMessage");
 
-    // Create order object
-    const order = {
-        fullName: fullName,
-        phoneNumber: phoneNumber,
-        email: email,
-        district: district,
-        thana: thana,
-        address: address,
-        productName: productName,
-        totalAmount: totalAmount,
-        currentDateTime: new Date().toLocaleString(),
-        orderNumber: Math.floor(Math.random() * 1000000) + 1
-    };
+            const message = `Your order (Order Number: ${order.orderNumber}) has been successfully submitted. Payable on Cash on Delivery: ৳${cashOnDeliveryAmount.toFixed(2)}.`;
+            modalMessage.innerHTML = message;
 
-    // Save order to localStorage
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
+            modal.style.display = "block";
 
-    // Get the modal and modal message
-    const modal = document.getElementById("myModal");
-    const modalMessage = document.getElementById("modalMessage");
+            const okButton = document.getElementById("okButton");
+            okButton.onclick = function() {
+                modal.style.display = "none";
+            }
 
-    // Display success message in the modal
-    const message = `Your order (Order Number: ${order.orderNumber}) has been successfully submitted. Payable on Cash on Delivery: $${cashOnDeliveryAmount.toFixed(2)}.`;
-    modalMessage.innerHTML = message;
+            document.getElementById('orderForm').reset();
+        }
 
-    // Show the modal
-    modal.style.display = "block";
+        function updateCartCounter() {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCounter = document.getElementById('cartCounter');
+            if (cartItems.length > 0) {
+                cartCounter.textContent = cartItems.length;
+            } else {
+                cartCounter.textContent = '';
+            }
+        }
 
-    // Close the modal when OK button is clicked
-    const okButton = document.getElementById("okButton");
-    okButton.onclick = function() {
-        modal.style.display = "none";
-    }
+        const requiredOkButton = document.getElementById("requiredOkButton");
+        requiredOkButton.onclick = function() {
+            const requiredModal = document.getElementById("requiredModal");
+            requiredModal.style.display = "none";
+        }
 
-    // Reset form fields
-    document.getElementById('orderForm').reset();
-}
+        window.onload = function() {
+            displayOrderSummary();
+            updateCartCounter();
+        }
 
-  
-  function updateCartCounter() {
-    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartCounter = document.getElementById('cartCounter');
-    if (cartItems.length > 0) {
-        cartCounter.textContent = cartItems.length;
-    } else {
-        cartCounter.textContent = ''; // Hide the counter if cart is empty
-    }
-}
-  
-  // Close the required form message modal when OK button is clicked
-const requiredOkButton = document.getElementById("requiredOkButton");
-requiredOkButton.onclick = function() {
-    const requiredModal = document.getElementById("requiredModal");
-    requiredModal.style.display = "none";
-}
-
-// Call the function to display order summary when the page loads
-window.onload = function() {
-    displayOrderSummary();
-    updateCartCounter(); // Update cart counter when the page loads
-}
-
-// Call the function to update cart counter whenever an item is added to or removed from the cart
-updateCartCounter();
-
-  
+        updateCartCounter();
     </script>
-  
-  
-  
-  
-  
-  
 </body>
 </html>
