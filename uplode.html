@@ -102,7 +102,7 @@
             };
 
             // Save product to localStorage or send to server
-            // For simplicity, we'll just use localStorage here
+            // For simplicity, well just use localStorage here
             const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
             uploadedProducts.push(product);
             localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
@@ -174,8 +174,17 @@
             const confirmDelete = confirm('Are you sure you want to delete this product?');
             if (confirmDelete) {
                 const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+                const deletedProduct = uploadedProducts[index];
+                
+                // Check if the product exists in the cart
+                const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+                const updatedCart = cartItems.filter(item => item.name !== deletedProduct.name);
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                
+                // Remove the product from uploadedProducts
                 uploadedProducts.splice(index, 1);
                 localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
+                
                 displayUploadedProducts();
             }
         }
