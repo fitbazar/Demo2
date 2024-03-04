@@ -265,45 +265,45 @@ input[type="text"] {
             }
         }
 
-        // Function to display products
-        function displayProducts(products) {
-            const productList = document.getElementById('productList');
-            productList.innerHTML = '';
+       // Function to display products
+function displayProducts(products) {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
 
-            // Loop through uploaded products and create product boxes
-            products.forEach(product => {
-                const productBox = document.createElement('div');
-                productBox.classList.add('productBox');
+    // Reverse the order of displayed products
+    products.reverse().forEach(product => {
+        const productBox = document.createElement('div');
+        productBox.classList.add('productBox');
 
-                // Product image wrapped in anchor tag
-                const imgLink = document.createElement('a');
-                imgLink.href = `product.html?name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&imageURL=${encodeURIComponent(product.imageURL)}&description=${encodeURIComponent(product.description)}`;
-                const img = document.createElement('img');
-                img.src = product.imageURL;
-                img.alt = product.name;
-                imgLink.appendChild(img);
-                productBox.appendChild(imgLink);
+        // Product image wrapped in anchor tag
+        const imgLink = document.createElement('a');
+        imgLink.href = `product.html?name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&imageURL=${encodeURIComponent(product.imageURL)}&description=${encodeURIComponent(product.description)}`;
+        const img = document.createElement('img');
+        img.src = product.imageURL;
+        img.alt = product.name;
+        imgLink.appendChild(img);
+        productBox.appendChild(imgLink);
 
-                // Product name
-                const name = document.createElement('h3');
-                name.textContent = product.name;
-                productBox.appendChild(name);
+        // Product name
+        const name = document.createElement('h3');
+        name.textContent = product.name;
+        productBox.appendChild(name);
 
-                // Product price
-                const price = document.createElement('p');
-                price.textContent = `৳${product.price}`;
-                productBox.appendChild(price);
+        // Product price
+        const price = document.createElement('p');
+        price.textContent = `৳${product.price}`;
+        productBox.appendChild(price);
 
-                // Add to cart button
-                const button = document.createElement('button');
-                button.textContent = 'Add to Cart';
-                button.addEventListener('click', () => addToCart(product.name, product.price, product.imageURL));
-                productBox.appendChild(button);
+        // Add to cart button
+        const button = document.createElement('button');
+        button.textContent = 'Add to Cart';
+        button.addEventListener('click', () => addToCart(product.name, product.price, product.imageURL));
+        productBox.appendChild(button);
 
-                // Append product box to product list
-                productList.appendChild(productBox);
-            });
-        }
+        // Append product box to product list
+        productList.appendChild(productBox);
+    });
+}
 
         // Function to show modal content
         function showModal(message) {
