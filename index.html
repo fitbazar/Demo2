@@ -167,14 +167,22 @@ input[type="text"] {
             margin-top: 20px;
             padding: 10px;
             border: 2px solid #ccc;
+          
             border-radius: 5px;
         }
+  
+  .no-match {
+            color: red; /* Red text color */
+            margin-top: 10px; /* Add margin above the message */
+        }
+  
     </style>
 </head>
 <body>
     <header>
         <h1>Welcome to Our Store</h1>
         <input type="text" id="search" oninput="searchProducts()" placeholder="Search by Product Name">
+      <p id="noMatchMessage" class="no-match" style="display: none;">No matching products found.</p>
     </header>
 
     <div id="productList"></div>
@@ -324,8 +332,15 @@ input[type="text"] {
             const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
             const filteredProducts = uploadedProducts.filter(product => product.name.toLowerCase().includes(searchQuery));
             displayProducts(filteredProducts);
-        }
 
+            // Show no match message if no matching products found
+            const noMatchMessage = document.getElementById('noMatchMessage');
+            if (filteredProducts.length === 0) {
+                noMatchMessage.style.display = 'block';
+            } else {
+                noMatchMessage.style.display = 'none';
+            }
+        }
         // Call the function to display products and update cart counter when the page is loaded
         window.onload = function () {
             const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
