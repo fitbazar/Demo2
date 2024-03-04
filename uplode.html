@@ -112,29 +112,30 @@
             alert('Product uploaded successfully!');
         });
 
-        // Function to display uploaded products
-        function displayUploadedProducts() {
-            const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
-            const uploadedProductsDiv = document.getElementById('uploadedProducts');
-            uploadedProductsDiv.innerHTML = '';
+      // Function to display uploaded products
+function displayUploadedProducts() {
+    const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+    const uploadedProductsDiv = document.getElementById('uploadedProducts');
+    uploadedProductsDiv.innerHTML = '';
 
-            uploadedProducts.forEach((product, index) => {
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <h3>${product.name}</h3>
-                    <p>Price: ৳${product.price}</p>
-                    <img src="${product.imageURL}" alt="${product.name}" width="200">
-                    <p>${product.description}</p>
-                    <button onclick="editProduct(${index})">Edit</button>
-                    <button onclick="deleteProduct(${index})">Delete</button>
-                `;
-                uploadedProductsDiv.appendChild(productCard);
-            });
+    uploadedProducts.reverse().forEach((product, index) => { // Reverse the array here
+        const productCard = document.createElement('div');
+        productCard.classList.add('product-card');
+        productCard.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>Price: ৳${product.price}</p>
+            <img src="${product.imageURL}" alt="${product.name}" width="200">
+            <p>${product.description}</p>
+            <button onclick="editProduct(${index})">Edit</button>
+            <button onclick="deleteProduct(${index})">Delete</button>
+        `;
+        uploadedProductsDiv.appendChild(productCard);
+    });
 
-            // Update index page
-            localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
-        }
+    // Update index page
+    localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
+}
+
 
         // Initial display of uploaded products
         displayUploadedProducts();
