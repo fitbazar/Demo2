@@ -112,13 +112,14 @@
             alert('Product uploaded successfully!');
         });
 
-      // Function to display uploaded products
+  // Function to display uploaded products
 function displayUploadedProducts() {
-    const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+    let uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
     const uploadedProductsDiv = document.getElementById('uploadedProducts');
     uploadedProductsDiv.innerHTML = '';
 
-    uploadedProducts.reverse().forEach((product, index) => { // Reverse the array here
+    // Reverse the order of displayed products
+    uploadedProducts.reverse().forEach((product, index) => {
         const productCard = document.createElement('div');
         productCard.classList.add('product-card');
         productCard.innerHTML = `
@@ -132,9 +133,11 @@ function displayUploadedProducts() {
         uploadedProductsDiv.appendChild(productCard);
     });
 
-    // Update index page
+    // Save products in reverse order
+    uploadedProducts.reverse();
     localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
 }
+
 
 
         // Initial display of uploaded products
