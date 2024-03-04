@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            text-align: center;
+            
+            padding-bottom: 80px;
+        }
+/* CSS for header */
+header {
+    background-color: #333; /* Header background color */
+    color: white; /* Text color */
+    padding: 20px; /* Add padding for better appearance */
+}
+
+h1 {
+    margin: 0; /* Remove default margin */
+}
+
+/* Centering the h1 name */
+h1 {
+    text-align: center; /* Center text horizontally */
+}
+
+/* Adjustments for better visibility and spacing */
+input[type="text"] {
+    margin-top: 10px; /* Add margin above the search input */
+    width: 80%; /* Make the search input wider */
+    padding: 10px; /* Increase padding for better appearance */
+    border-radius: 5px; /* Add border radius for rounded corners */
+    border: 1px solid #ccc; /* Add border for clarity */
+    box-sizing: border-box; /* Include padding and border in the elements total width */
+}
+
+
+  
+        .productBox {
+            width: calc(50% - 20px);
+            max-width: 150px;
+            height: 220px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: top;
+            position: relative;
+        }
+
+        .productBox img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .productBox h3,
+        .productBox p {
+            margin: 5px 0;
+        }
+
+        .productBox button {
+            position: absolute;
+            width : 70%;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .productBox button:hover {
+            background-color: #45a049;
+        }
+
+        #productList {
+            text-align: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .nav.nav--icons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            width: 300px;
+        }
+
+        .nav.nav--icons ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav.nav--icons li {
+            margin-right: 20px;
+        }
+
+        .nav.nav--icons li:last-child {
+            margin-right: 0;
+        }
+
+        .nav.nav--icons a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav.nav--icons i {
+            margin-bottom: 5px;
+        }
+
+        /* Modal Content/Box */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9); /* White w/ opacity */
+            padding: 20px;
+            border-radius: 10px;
+            color: black;
+            text-align: center;
+        }
+
+        #search {
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Store</h1>
+        <input type="text" id="search" oninput="searchProducts()" placeholder="Search by Product Name">
+    </header>
+
+    <div id="productList"></div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            
+            <p id="modalContent"></p>
+        </div>
+    </div>
+
+    <nav class="nav nav--icons">
+        <ul>
+            <li>
+                <a href="index.html">
+                    <i class="fas fa-home" style="font-size: 24px;"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
+                    <span id="cartCounter">0</span>
+                </a>
+            </li>
+            <li>
+                <a href="contact.html">
+                    <i class="fas fa-address-book" style="font-size: 24px;"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        // Function to update cart counter when the page loads
+        function updateCartCounterOnLoad() {
+            // Get the cart items from localStorage
+            let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Update the cart counter
+            updateCartCounter(cartItems.length);
+        }
+
+        // Function to update the cart counter
+        function updateCartCounter(count) {
+            document.getElementById('cartCounter').textContent = count;
+        }
+
+        // Function to add product to cart
+        function addToCart(productName, productPrice, productImageURL) {
+            // Get the cart items from localStorage
+            let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Check if the product is already in the cart
+            const isAlreadyInCart = cartItems.some(item => item.name === productName);
+
+            // If the product is not already in the cart, add it
+            if (!isAlreadyInCart) {
+                // Push the new item to the cart
+                cartItems.push({
+                    name: productName,
+                    price: productPrice,
+                    imageURL: productImageURL
+                });
+
+                // Save the updated cart items back to localStorage
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+
+                // Update the cart counter
+                updateCartCounter(cartItems.length);
+
+                // Provide feedback to the user
+                showModal('Item added to cart successfully.');
+            } else {
+                // Provide feedback to the user if the item is already in the cart
+                showModal('This item is already added to the cart.');
+            }
+        }
+
+        // Function to display products
+        function displayProducts(products) {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            // Loop through uploaded products and create product boxes
+            products.forEach(product => {
+                const productBox = document.createElement('div');
+                productBox.classList.add('productBox');
+
+                // Product image wrapped in anchor tag
+                const imgLink = document.createElement('a');
+                imgLink.href = `product.html?name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&imageURL=${encodeURIComponent(product.imageURL)}&description=${encodeURIComponent(product.description)}`;
+                const img = document.createElement('img');
+                img.src = product.imageURL;
+                img.alt = product.name;
+                imgLink.appendChild(img);
+                productBox.appendChild(imgLink);
+
+                // Product name
+                const name = document.createElement('h3');
+                name.textContent = product.name;
+                productBox.appendChild(name);
+
+                // Product price
+                const price = document.createElement('p');
+                price.textContent = `৳${product.price}`;
+                productBox.appendChild(price);
+
+                // Add to cart button
+                const button = document.createElement('button');
+                button.textContent = 'Add to Cart';
+                button.addEventListener('click', () => addToCart(product.name, product.price, product.imageURL));
+                productBox.appendChild(button);
+
+                // Append product box to product list
+                productList.appendChild(productBox);
+            });
+        }
+
+        // Function to show modal content
+        function showModal(message) {
+            const modal = document.getElementById('myModal');
+            const modalContent = document.getElementById('modalContent');
+            modalContent.textContent = message;
+            modal.style.display = 'block';
+
+            // Hide the modal after 2 seconds
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 1000);
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Function to search products by name
+        function searchProducts() {
+            const searchQuery = document.getElementById('search').value.toLowerCase();
+            const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+            const filteredProducts = uploadedProducts.filter(product => product.name.toLowerCase().includes(searchQuery));
+            displayProducts(filteredProducts);
+        }
+
+        // Call the function to display products and update cart counter when the page is loaded
+        window.onload = function () {
+            const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+            displayProducts(uploadedProducts);
+            updateCartCounterOnLoad();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submitted Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .order {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            position: relative; /* added for positioning checkbox */
+        }
+
+        .noMatch {
+            color: red;
+            font-weight: bold;
+        }
+
+        .deleteButton {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 10px; /* added for spacing */
+        }
+
+        .deleteButton:hover {
+            background-color: darkred;
+        }
+
+        /* added checkbox styling */
+        .markCheckbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* Style for confirmation dialog */
+        .confirmation-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+            width: 300px; /* increased width */
+            display: flex;
+            flex-direction: column; /* added flex-direction */
+            align-items: center; /* added align-items */
+        }
+
+        .confirmation-dialog p {
+            margin: 0;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .confirmation-dialog button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 20px;
+            cursor: pointer;
+            margin: 10px; /* added margin */
+            width: 120px; /* adjusted button width */
+        }
+
+        .confirmation-dialog button:hover {
+            background-color: darkred;
+        }
+
+        .confirmation-dialog button.cancel {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submitted Orders</h1>
+
+    <label for="searchOrder">Search Order by ID:</label>
+    <input type="text" id="searchOrder" oninput="searchOrder()" placeholder="Enter Order ID">
+
+    <div id="orderContainer">
+        <!-- Orders will be dynamically added here -->
+    </div>
+
+    <p id="noMatchMessage" class="noMatch" style="display: none;">No matching orders found.</p>
+
+    <!-- Confirmation dialog -->
+    <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
+        <p>Are you sure you want to delete this order?</p>
+        <button class="confirm" onclick="confirmDeleteOrder()">Yes, Delete</button>
+        <button class="cancel" onclick="cancelDeleteOrder()">Cancel</button>
+    </div>
+
+    <script>
+        // Load orders from localStorage
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        // Sort orders by the latest date and time
+        orders.sort((a, b) => new Date(b.currentDateTime) - new Date(a.currentDateTime));
+
+        // Display orders in the container
+        const orderContainer = document.getElementById('orderContainer');
+        orders.forEach(order => {
+            const orderDiv = document.createElement('div');
+            orderDiv.classList.add('order');
+            orderDiv.innerHTML = `
+                <h2>Order Number: ${order.orderNumber}</h2>
+                <p><strong>Full Name:</strong> ${order.fullName}</p>
+                <p><strong>Phone Number:</strong> ${order.phoneNumber}</p>
+                <p><strong>Email:</strong> ${order.email}</p>
+                <p><strong>District:</strong> ${order.district}</p>
+                <p><strong>Thana:</strong> ${order.thana}</p>
+                <p><strong>Address:</strong> ${order.address}</p>
+                <p><strong>Product Name:</strong> ${order.productName}</p>
+                <p><strong>Total Amount:</strong> ${order.totalAmount}</p>
+                <p><strong>Order Date:</strong> ${order.currentDateTime}</p>
+                <button class="deleteButton" onclick="showConfirmationDialog(${order.orderNumber})">Delete</button>
+                <input type="checkbox" class="markCheckbox" onclick="markOrder(event)" ${order.marked ? 'checked' : ''}>
+            `;
+            orderContainer.appendChild(orderDiv);
+        });
+
+        // Function to show confirmation dialog
+        function showConfirmationDialog(orderNumber) {
+            const confirmationDialog = document.getElementById('confirmationDialog');
+            confirmationDialog.style.display = 'flex'; // Changed display to flex
+            confirmationDialog.dataset.orderNumber = orderNumber;
+        }
+
+        // Function to confirm delete order
+        function confirmDeleteOrder() {
+            const orderNumber = parseInt(document.getElementById('confirmationDialog').dataset.orderNumber);
+            const updatedOrders = orders.filter(order => order.orderNumber !== orderNumber);
+            localStorage.setItem('orders', JSON.stringify(updatedOrders));
+            location.reload(); // Reload the page to reflect changes
+        }
+
+        // Function to cancel delete order
+        function cancelDeleteOrder() {
+            document.getElementById('confirmationDialog').style.display = 'none';
+        }
+
+        // Function to mark an order
+        function markOrder(event) {
+            const orderDiv = event.target.parentElement;
+            const orderNumber = parseInt(orderDiv.querySelector('h2').innerText.split(': ')[1]);
+            const orderIndex = orders.findIndex(order => order.orderNumber === orderNumber);
+            orders[orderIndex].marked = event.target.checked;
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        // Function to search for an order by order ID
+        function searchOrder() {
+            const searchValue = document.getElementById('searchOrder').value.trim().toLowerCase();
+            const orderDivs = document.querySelectorAll('.order');
+            let matchFound = false;
+            orderDivs.forEach(orderDiv => {
+                const orderId = orderDiv.querySelector('h2').innerText.split(': ')[1].toLowerCase();
+                if (orderId.includes(searchValue)) {
+                    orderDiv.style.display = 'block';
+                    matchFound = true;
+                } else {
+                    orderDiv.style.display = 'none';
+                }
+            });
+
+            // Show or hide "No match" message
+            const noMatchMessage = document.getElementById('noMatchMessage');
+            if (matchFound) {
+                noMatchMessage.style.display = 'none';
+            } else {
+                noMatchMessage.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

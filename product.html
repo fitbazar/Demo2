@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            text-align: center;
+            margin: 0;
+            padding-bottom: 80px;
+        }
+
+        .productDetails {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .productDetails img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .productDetails h2,
+        .productDetails p {
+            margin: 10px 0;
+        }
+
+        .add-to-cart {
+            margin-top: 20px;
+        }
+
+        .add-to-cart button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-to-cart button:hover {
+            background-color: #45a049;
+        }
+  
+        .nav.nav--icons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            width: 300px;
+        }
+
+        .nav.nav--icons ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav.nav--icons li {
+            margin-right: 20px;
+        }
+
+        .nav.nav--icons li:last-child {
+            margin-right: 0;
+        }
+
+        .nav.nav--icons a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav.nav--icons i {
+            margin-bottom: 5px;
+        }
+
+        /* Modal Content/Box */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9); /* White w/ opacity */
+            padding: 20px;
+            border-radius: 10px;
+            color: black;
+            text-align: center;
+        }
+
+       
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Product Details</h1>
+    </header>
+
+    <div class="productDetails" id="productDetails">
+        <img id="productImage" src="" alt="Product Image">
+        <h2 id="productName"></h2>
+        <p id="productPrice"></p>
+        <div class="add-to-cart">
+            <button id="addToCartBtn">Add to Cart</button>
+        </div>
+        <p id="productDescription"></p>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <p id="modalContent"></p>
+        </div>
+    </div>
+
+    <nav class="nav nav--icons">
+        <ul>
+            <li>
+                <a href="index.html">
+                    <i class="fas fa-home" style="font-size: 24px;"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
+                    <span id="cartCounter">0</span>
+                </a>
+            </li>
+            <li>
+                <a href="contact.html">
+                    <i class="fas fa-address-book" style="font-size: 24px;"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        // Function to get URL parameters
+        function getUrlParams() {
+            const searchParams = new URLSearchParams(window.location.search);
+            const params = {};
+            for (const [key, value] of searchParams) {
+                params[key] = value;
+            }
+            return params;
+        }
+
+        // Function to display product details
+        function displayProductDetails() {
+            const params = getUrlParams();
+            const productNameElement = document.getElementById('productName');
+            const productImageElement = document.getElementById('productImage');
+            const productPriceElement = document.getElementById('productPrice');
+            const productDescriptionElement = document.getElementById('productDescription');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+
+            if (params.name && params.price && params.imageURL && params.description) {
+                productNameElement.textContent = decodeURIComponent(params.name);
+                productImageElement.src = decodeURIComponent(params.imageURL);
+                productImageElement.alt = decodeURIComponent(params.name);
+                productPriceElement.textContent = `Price: $${decodeURIComponent(params.price)}`; // Add "Price:" before the price value
+                productDescriptionElement.textContent = `Description: ${decodeURIComponent(params.description)}`; // Add "Description:" before the description value
+                addToCartBtn.addEventListener('click', function() {
+                    addToCart(params.name, params.price, params.imageURL);
+                });
+            } else {
+                productNameElement.textContent = 'Product details not found';
+            }
+        }
+
+        // Call the function to display product details when the page is loaded
+        window.onload = function () {
+            displayProductDetails();
+            updateCartCounterOnLoad(); // Update cart counter on page load
+        };
+      
+        // Function to add product to cart
+        function addToCart(productName, productPrice, productImageURL) {
+            // Get the cart items from localStorage
+            let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Check if the product is already in the cart
+            const isAlreadyInCart = cartItems.some(item => item.name === productName);
+
+            // If the product is not already in the cart, add it
+            if (!isAlreadyInCart) {
+                // Push the new item to the cart
+                cartItems.push({
+                    name: productName,
+                    price: productPrice,
+                    imageURL: productImageURL
+                });
+
+                // Save the updated cart items back to localStorage
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+
+                // Update the cart counter
+                updateCartCounter(cartItems.length);
+
+                // Show modal feedback to the user
+                showModal('Item added to cart successfully.');
+            } else {
+                // Show modal feedback to the user if the item is already in the cart
+                showModal('This item is already added to the cart.');
+            }
+        }
+
+        // Function to update cart counter
+        function updateCartCounter(count) {
+            document.getElementById('cartCounter').textContent = count;
+        }
+      
+        // Function to update cart counter on page load
+        function updateCartCounterOnLoad() {
+            // Get cart items from localStorage
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            // Update cart counter
+            updateCartCounter(cartItems.length);
+        }
+      
+        // Function to show modal content
+        function showModal(message) {
+            const modal = document.getElementById('myModal');
+            const modalContent = document.getElementById('modalContent');
+            modalContent.textContent = message;
+            modal.style.display = 'block';
+
+            // Hide the modal after 2 seconds
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 1000);
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

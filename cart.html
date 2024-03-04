@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY CART</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            padding-left:20px;
+            padding-right:20px;
+            padding-bottom: 90px;
+        }
+  
+        /* Add your CSS styles here */
+        .productItem {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Align items and price to opposite ends */
+        }
+        .productItem img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+        .productItem span {
+            margin-right: 10px;
+        }
+        .productName {
+            margin-right: auto; /* Push the product name to the left */
+        }
+        .productPrice {
+            margin-left: auto; /* Push the product price to the right */
+        }
+  
+        .quantity {
+            display: flex; /* Use flexbox */
+            align-items: center; /* Align items vertically centered */
+            margin-right: 20px; /* Add margin-right to create space between quantity buttons and delete button */
+        }
+
+        .quantity button {
+            width: 30px; /* Set a fixed width for the buttons */
+            height: 30px; /* Set a fixed height for the buttons */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0; /* Remove padding to ensure fixed size */
+            cursor: pointer;
+            display: flex; /* Use flexbox */
+            align-items: center; /* Align content vertically centered */
+            justify-content: center; /* Align content horizontally centered */
+        }
+
+        .quantity span {
+            margin: 0 5px; /* Add margin between the number and the buttons */
+        }
+  
+        .productItem .deleteButton {
+            font-size: 16px; /* Adjust the font size as needed */
+        }
+  
+        .deleteButton {
+            margin-top: 10px; /* Add margin to move the delete button down */
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+  
+        .deleteButton:hover {
+            color: red; /* Change color on hover */
+        }
+        #total {
+            margin-top: 20px;
+            font-weight: bold;
+            display: block; /* Display initially */
+            text-align: right; /* Align to the right */
+        }
+        #buyNowButton {
+            margin-top: 20px;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            border-radius: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #emptyCartMessage {
+            margin-top: 20px;
+            font-weight: bold;
+            display: none; /* Hide initially */
+            text-align: center; /* Center align the text */
+            font-size: 24px; /* Increase font size */
+            color: #555; /* Change text color */
+            position: absolute; /* Position in the center */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+
+    <style>
+        .nav.nav--icons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            width: 300px;
+        }
+
+        .nav.nav--icons ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav.nav--icons li {
+            margin-right: 20px;
+        }
+
+        .nav.nav--icons li:last-child {
+            margin-right: 0;
+        }
+
+        .nav.nav--icons a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav.nav--icons i {
+            margin-bottom: 5px;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>MY CART</h1>
+    </header>
+
+    <div id="cartItems"></div>
+
+    <div id="total"></div>
+
+    <button id="buyNowButton">Buy Now</button>
+
+    <p id="emptyCartMessage">Your cart is empty.</p>
+
+    <nav class="nav nav--icons">
+        <ul>
+            <li>
+                <a href="index.html">
+                    <i class="fas fa-home" style="font-size: 24px;"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
+                    <span id="cartCounter">0</span>
+                </a>
+            </li>
+            <li>
+                <a href="contact.html">
+                    <i class="fas fa-address-book" style="font-size: 24px;"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        function updateCartCounter() {
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartCounter = document.getElementById('cartCounter');
+    cartCounter.textContent = cartItems.length;
+
+    // Toggle visibility of total and buy button based on cart items length
+    const totalDiv = document.getElementById('total');
+    const buyNowButton = document.getElementById('buyNowButton');
+    const emptyCartMessage = document.getElementById('emptyCartMessage');
+
+    if (cartItems.length > 0) {
+        totalDiv.style.display = 'block';
+        buyNowButton.style.display = 'block';
+        emptyCartMessage.style.display = 'none';
+    } else {
+        totalDiv.style.display = 'none';
+        buyNowButton.style.display = 'none';
+        emptyCartMessage.style.display = 'block';
+    }
+}
+
+
+        // Initial update of cart counter
+        updateCartCounter();
+
+        // Add event listener to the "Buy Now" button
+        document.getElementById('buyNowButton').addEventListener('click', function() {
+            // Redirect to the order form page
+            window.location.href = 'order_form.html';
+        });
+    </script>
+
+    <script>
+        // Retrieve cart items from localStorage
+        const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Function to display cart items
+        function displayCartItems() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            cartItemsDiv.innerHTML = '';
+
+            cartItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('productItem');
+                itemDiv.innerHTML = `
+                    <img src="${item.imageURL}" alt="${item.name}">
+                    <span class="productName">${item.name}</span>
+                    <span class="productPrice">৳${item.price}</span>
+                    <div class="quantity">
+                        <button onclick="decreaseQuantity(${index})">-</button>
+                        <span>${item.quantity || 1}</span>
+                        <button onclick="increaseQuantity(${index})">+</button>
+                    </div>
+                    <button class="deleteButton" onclick="removeFromCart(${index})">
+                        <i class="fas fa-times"></i> <!-- Font Awesome close icon -->
+                    </button>
+                `;
+                cartItemsDiv.appendChild(itemDiv);
+            });
+
+            // Calculate and display total price
+            const total = cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+            const totalDiv = document.getElementById('total');
+            totalDiv.textContent = `Shipping Fee ৳10_____________Total: ৳${total + 10}`; // Adding shipping fee
+        }
+
+        // Function to increase quantity
+        function increaseQuantity(index) {
+            cartItems[index].quantity = Math.max((cartItems[index].quantity || 1) + 1, 1);
+            displayCartItems();
+            updateCartInLocalStorage();
+        }
+
+        // Function to decrease quantity
+        function decreaseQuantity(index) {
+            if (cartItems[index].quantity > 1) {
+                cartItems[index].quantity--;
+                displayCartItems();
+                updateCartInLocalStorage();
+            }
+        }
+
+        // Function to remove item from cart
+        function removeFromCart(index) {
+            cartItems.splice(index, 1);
+            displayCartItems();
+            updateCartInLocalStorage();
+            updateCartCounter(); // Update cart counter after removing item
+        }
+
+        // Function to update cart in localStorage
+        function updateCartInLocalStorage() {
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+        }
+
+        // Initial display of cart items
+        displayCartItems();
+    </script>
+</body>
+</html>
