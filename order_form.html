@@ -290,8 +290,9 @@
 
             const modal = document.getElementById("myModal");
             const modalMessage = document.getElementById("modalMessage");
+const message = `Your order (Order Number: ${order.orderNumber}) has been successfully submitted.`;
 
-            const message = `Your order (Order Number: ${order.orderNumber}) has been successfully submitted. Payable on Cash on Delivery: ৳${cashOnDeliveryAmount.toFixed(2)}.`;
+            
             modalMessage.innerHTML = message;
 
             modal.style.display = "block";
