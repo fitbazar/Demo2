@@ -216,8 +216,39 @@
 
         // Add event listener to the "Buy Now" button
         document.getElementById('buyNowButton').addEventListener('click', function() {
-            // Redirect to the order form page
-            window.location.href = 'order_form.html';
+            // Check if all items in the cart still exist in the uploaded products
+            const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+            const isValidCart = cartItems.every(cartItem => {
+                return uploadedProducts.some(product => product.name === cartItem.name);
+            });
+
+            if (isValidCart) {
+                // Redirect to the order form page
+                window.location.href = 'order_form.html';
+            } else {
+                // Show error message
+                alert('Something went wrong. Please try again.');
+            }
+        });
+
+        // Listen for changes in the uploaded products
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'uploadedProducts') {
+                // Check if any items in the cart are affected by the changes
+                const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
+                const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+                const isValidCart = cartItems.every(cartItem => {
+                    return uploadedProducts.some(product => product.name === cartItem.name);
+                });
+
+                // If any item in the cart does not exist in the uploaded products, display an error message
+                if (!isValidCart) {
+                    alert('Something went wrong. Please try again.');
+                }
+            }
         });
     </script>
 
