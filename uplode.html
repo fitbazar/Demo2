@@ -60,9 +60,85 @@
             margin-bottom: 20px;
             padding-bottom: 20px;
         }
+  
+  
+  .login-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        .login-content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .login-content button {
+            width: 100%;
+            padding: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login-content button:hover {
+            background-color: darkred;
+        }
+
+        .invalid-msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+            display: none; /* initially hidden */
+        }
+  
+  
+  #loginPopup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white; /* semi-transparent background */
+}
+
+  
+  
     </style>
 </head>
 <body>
+  
+  
+  <!-- Login Popup -->
+    <div id="loginPopup" style="display: none;">
+        <div class="login-content">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <div id="invalidMsg" class="invalid-msg">Invalid username or password</div>
+        </div>
+    </div>
+  
+  
     <h1>Upload Product</h1>
     <form id="uploadForm">
         <label for="productName">Product Name:</label>
@@ -111,15 +187,19 @@
 
             alert('Product uploaded successfully!');
         });
+    </script>
 
-  // Function to display uploaded products
+
+
+<script>
+    
+// Function to display uploaded products
 function displayUploadedProducts() {
     let uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
     const uploadedProductsDiv = document.getElementById('uploadedProducts');
     uploadedProductsDiv.innerHTML = '';
 
-    // Reverse the order of displayed products
-    uploadedProducts.reverse().forEach((product, index) => {
+    uploadedProducts.forEach((product, index) => {
         const productCard = document.createElement('div');
         productCard.classList.add('product-card');
         productCard.innerHTML = `
@@ -130,68 +210,92 @@ function displayUploadedProducts() {
             <button onclick="editProduct(${index})">Edit</button>
             <button onclick="deleteProduct(${index})">Delete</button>
         `;
-        uploadedProductsDiv.appendChild(productCard);
+        uploadedProductsDiv.insertBefore(productCard, uploadedProductsDiv.firstChild);
     });
-
-    // Save products in reverse order
-    uploadedProducts.reverse();
-    localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
 }
 
 
-
-        // Initial display of uploaded products
-        displayUploadedProducts();
-
-        // Function to edit a product
-        function editProduct(index) {
+    // Function to delete a product
+    function deleteProduct(index) {
+        const confirmDelete = confirm('Are you sure you want to delete this product?');
+        if (confirmDelete) {
             const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
-            const product = uploadedProducts[index];
-            const newName = prompt('Enter new name:', product.name);
-            const newPrice = prompt('Enter new price:', product.price);
-            const newImageURL = prompt('Enter new image URL:', product.imageURL);
-            const newDescription = prompt('Enter new description:', product.description);
+            const deletedProduct = uploadedProducts[index];
+            
+            // Check if the product exists in the cart
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            const updatedCart = cartItems.filter(item => item.name !== deletedProduct.name);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+            
+            // Remove the product from uploadedProducts
+            uploadedProducts.splice(index, 1);
+            localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
+            
+            displayUploadedProducts();
+        }
+    }
 
-            if (newName && newPrice && newImageURL && newDescription) {
-                // Check if the edited product exists in the cart and remove it
-                const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-                const isItemInCart = cartItems.findIndex(item => item.name === product.name);
-                if (isItemInCart !== -1) {
-                    cartItems.splice(isItemInCart, 1);
-                    localStorage.setItem('cart', JSON.stringify(cartItems));
-                }
+    // Call displayUploadedProducts() once the DOM content is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        displayUploadedProducts();
+    });
+</script>
 
-                // Update the edited product
-                uploadedProducts[index] = {
-                    name: newName,
-                    price: newPrice,
-                    imageURL: newImageURL,
-                    description: newDescription
+
+
+
+
+
+<script>
+
+
+// Check if device info is already stored
+        const deviceInfo = JSON.parse(localStorage.getItem('deviceInfo'));
+        if (deviceInfo) {
+            // If device info is found, show main content
+            document.getElementById('mainContent').style.display = 'block';
+            // Update device list
+            updateDeviceList();
+        } else {
+            // If device info is not found, show login popup
+            document.getElementById('loginPopup').style.display = 'flex';
+        }
+
+
+// Function to handle login
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            
+            if (username === "rey1" && password === "rey1") {
+                document.getElementById("loginPopup").style.display = "none";
+                
+                // Save device info to local storage
+                const deviceInfo = {
+                    deviceName: navigator.userAgent,
+                    progress: "logged in"
                 };
-                localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
-                displayUploadedProducts();
+                localStorage.setItem('deviceInfo', JSON.stringify(deviceInfo));
+                
+                // Show main content
+                document.getElementById('mainContent').style.display = 'block';
+                
+                // Update device list
+                updateDeviceList();
+            } else {
+                // Show invalid message
+                document.getElementById("invalidMsg").style.display = "block";
             }
         }
 
-        // Function to delete a product
-        function deleteProduct(index) {
-            const confirmDelete = confirm('Are you sure you want to delete this product?');
-            if (confirmDelete) {
-                const uploadedProducts = JSON.parse(localStorage.getItem('uploadedProducts')) || [];
-                const deletedProduct = uploadedProducts[index];
-                
-                // Check if the product exists in the cart
-                const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-                const updatedCart = cartItems.filter(item => item.name !== deletedProduct.name);
-                localStorage.setItem('cart', JSON.stringify(updatedCart));
-                
-                // Remove the product from uploadedProducts
-                uploadedProducts.splice(index, 1);
-                localStorage.setItem('uploadedProducts', JSON.stringify(uploadedProducts));
-                
-                displayUploadedProducts();
-            }
+        // Function to close invalid credentials popup
+        function closeInvalidPopup() {
+            document.getElementById("invalidMsg").style.display = "none";
         }
-    </script>
+
+
+</script>
+
+
 </body>
 </html>
