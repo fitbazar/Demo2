@@ -60,7 +60,8 @@
             padding: 20px;
             box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
             width: 300px; /* increased width */
-            display: flex;
+            display: none;
+            /* initially hidden */
             flex-direction: column; /* added flex-direction */
             align-items: center; /* added align-items */
         }
@@ -90,28 +91,139 @@
             background-color: #ddd;
             color: black;
         }
+
+        /* Device List Styles */
+        #deviceList {
+            display: none;
+            /* initially hidden */
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        #deviceList h2 {
+            text-align: center;
+        }
+
+        .deviceEntry {
+            margin-bottom: 10px;
+        }
+
+        .deviceEntry button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .deviceEntry button:hover {
+            background-color: darkred;
+        }
+  
+        .login-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        .login-content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .login-content button {
+            width: 100%;
+            padding: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login-content button:hover {
+            background-color: darkred;
+        }
+
+        .invalid-msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+            display: none; /* initially hidden */
+        }
     </style>
 </head>
 <body>
-    <h1>Submitted Orders</h1>
-
-    <label for="searchOrder">Search Order by ID:</label>
-    <input type="text" id="searchOrder" oninput="searchOrder()" placeholder="Enter Order ID">
-
-    <div id="orderContainer">
-        <!-- Orders will be dynamically added here -->
+    <!-- Login Popup -->
+    <div id="loginPopup" style="display: none;">
+        <div class="login-content">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <div id="invalidMsg" class="invalid-msg">Invalid username or password</div>
+        </div>
     </div>
 
-    <p id="noMatchMessage" class="noMatch" style="display: none;">No matching orders found.</p>
+    <!-- Device List -->
+    <div id="deviceList">
+        <h2>Logged in Devices</h2>
+        <div id="deviceEntries"></div>
+    </div>
 
-    <!-- Confirmation dialog -->
-    <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
-        <p>Are you sure you want to delete this order?</p>
-        <button class="confirm" onclick="confirmDeleteOrder()">Yes, Delete</button>
-        <button class="cancel" onclick="cancelDeleteOrder()">Cancel</button>
+    <!-- Main Content (Hidden initially until logged in) -->
+    <div id="mainContent" style="display: none;">
+        <h1>Submitted Orders</h1>
+
+        <label for="searchOrder">Search Order by ID:</label>
+        <input type="text" id="searchOrder" oninput="searchOrder()" placeholder="Enter Order ID">
+
+        <div id="orderContainer">
+            <!-- Orders will be dynamically added here -->
+        </div>
+
+        <p id="noMatchMessage" class="noMatch" style="display: none;">No matching orders found.</p>
+
+        <!-- Confirmation dialog -->
+        <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
+            <p>Are you sure you want to delete this order?</p>
+            <button class="confirm" onclick="confirmDeleteOrder()">Yes, Delete</button>
+            <button class="cancel" onclick="cancelDeleteOrder()">Cancel</button>
+        </div>
     </div>
 
     <script>
+        // Check if device info is already stored
+        const deviceInfo = JSON.parse(localStorage.getItem('deviceInfo'));
+        if (deviceInfo) {
+            // If device info is found, show main content
+            document.getElementById('mainContent').style.display = 'block';
+            // Update device list
+            updateDeviceList();
+        } else {
+            // If device info is not found, show login popup
+            document.getElementById('loginPopup').style.display = 'flex';
+        }
+
         // Load orders from localStorage
         let orders = JSON.parse(localStorage.getItem('orders')) || [];
 
@@ -191,6 +303,63 @@
             } else {
                 noMatchMessage.style.display = 'block';
             }
+        }
+
+        // Function to update device list
+        function updateDeviceList() {
+            const deviceInfo = JSON.parse(localStorage.getItem('deviceInfo'));
+            const deviceEntries = document.getElementById('deviceEntries');
+            deviceEntries.innerHTML = ''; // Clear existing entries
+            
+            if (deviceInfo) {
+                const deviceEntry = document.createElement('div');
+                deviceEntry.classList.add('deviceEntry');
+                deviceEntry.innerHTML = `
+                    <p><strong>Device Name:</strong> ${deviceInfo.deviceName}</p>
+                    <button onclick="removeDevice()">Remove</button>
+                `;
+                deviceEntries.appendChild(deviceEntry);
+            }
+            
+            document.getElementById('deviceList').style.display = 'block';
+        }
+
+        // Function to remove device entry
+        function removeDevice() {
+            localStorage.removeItem('deviceInfo');
+            document.getElementById('deviceList').style.display = 'none';
+            location.reload(); // Reload the page to reflect changes
+        }
+
+        // Function to handle login
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            
+            if (username === "rey1" && password === "rey1") {
+                document.getElementById("loginPopup").style.display = "none";
+                
+                // Save device info to local storage
+                const deviceInfo = {
+                    deviceName: navigator.userAgent,
+                    progress: "logged in"
+                };
+                localStorage.setItem('deviceInfo', JSON.stringify(deviceInfo));
+                
+                // Show main content
+                document.getElementById('mainContent').style.display = 'block';
+                
+                // Update device list
+                updateDeviceList();
+            } else {
+                // Show invalid message
+                document.getElementById("invalidMsg").style.display = "block";
+            }
+        }
+
+        // Function to close invalid credentials popup
+        function closeInvalidPopup() {
+            document.getElementById("invalidMsg").style.display = "none";
         }
     </script>
 </body>
